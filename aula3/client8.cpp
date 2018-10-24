@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   if (testaVb(vb,111)) printf("Recebi corretamente %lu bytes %u\n",vb.size(),111);
   else printf("Erro na recepcao de %lu bytes %u\n",vb.size(),111);
  
-  vb.assign(100000,222);
+  vb.assign(1000000,222);
   client.sendVb(vb);
   
   client.receiveVb(vb);

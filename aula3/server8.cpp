@@ -13,6 +13,6 @@ int main(void) {
   if (testaVb(vb,222)) printf("Recebi corretamente %lu bytes %u\n",vb.size(),222);
   else printf("Erro na recepcao de %lu bytes %u\n",vb.size(),222);
 
-  vb.assign(100000,2);
+  vb.assign(10,2);
   server.sendVb(vb);
 }
