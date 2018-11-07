@@ -12,6 +12,7 @@
 #include <unistd.h>
 // Cpp includes
 #include <iostream>
+#include <opencv2/core/core.hpp>
 #include <string>
 #include <vector>
 
@@ -44,6 +45,8 @@ public:
   void receiveUint(uint32_t &m);
   void sendVb(const vector<BYTE> &vb);
   void receiveVb(vector<BYTE> &st);
+  int sendImg(const cv::Mat_<cv::Vec3b> &img);
+  void receiveImg(cv::Mat_<cv::Vec3b> &img);
 };
 
 class CLIENT {
@@ -63,6 +66,8 @@ public:
   void receiveUint(uint32_t &m);
   void sendVb(const vector<BYTE> &vb);
   void receiveVb(vector<BYTE> &st);
+  int sendImg(const cv::Mat_<cv::Vec3b> &img);
+  void receiveImg(cv::Mat_<cv::Vec3b> &img);
 };
 
 // get sockaddr, IPv4 or IPv6:
@@ -156,11 +161,16 @@ void SERVER::waitConnection() {
 }
 
 void SERVER::sendBytes(int nBytesToSend, BYTE *buf) {
-  for (int i = 0; i < nBytesToSend; i++) {
-    int err = send(new_fd, &buf[i], 1, 0);
-    if (err == -1) {
+  int i=0;
+  int bytesSent;
+
+  do {
+    bytesSent = send(new_fd, &buf[i], MAXDATASIZE, 0);
+    i += bytesSent;
+  } while (bytesSent > 0);
+
+  if (bytesSent == -1) {
       perror("send error");
-    }
   }
 }
 
@@ -205,6 +215,44 @@ void SERVER::receiveVb(vector<BYTE> &st) {
   for (int i = 0; i < size; i++) {
     st.push_back(temp_arr[i]);
   }
+}
+
+int SERVER::sendImg(const cv::Mat_<cv::Vec3b> &img) {
+  // Check continuity
+  if (!img.isContinuous())
+    return -1;
+
+  // Send size followed by data
+  sendUint(img.rows);
+  printf("Sent %d\n", img.rows);
+  sendUint(img.cols);
+  printf("Sent %d\n", img.cols);
+  sendBytes(3 * img.rows * img.cols, img.data);
+  printf("Sent img data\n");
+  
+  // Check it was received
+  uint32_t err;
+  receiveUint(err);
+  return err;
+}
+
+void SERVER::receiveImg(cv::Mat_<cv::Vec3b> &img) {
+  // Receive size
+  uint32_t rows, cols;
+  receiveUint(rows);
+  receiveUint(cols);
+
+  // Allocate Mat and receive data
+  cv::Mat_<cv::Vec3b> recimg(rows, cols);
+  receiveBytes(3 * rows * cols, recimg.data);
+
+  // Acknowledge everything went ok
+  // TODO: in the future, send if there were errors
+  // 0 means no errors
+  sendUint(0);
+
+  // Copy received matrix over to source img
+  recimg.copyTo(img);
 }
 
 SERVER::~SERVER() { close(new_fd); }
@@ -291,6 +339,41 @@ void CLIENT::receiveVb(vector<BYTE> &st) {
   BYTE temp_arr[size];
   st.resize(size * sizeof(BYTE));
   receiveBytes(size, st.data());
+}
+
+int CLIENT::sendImg(const cv::Mat_<cv::Vec3b> &img) {
+  // Check continuity
+  if (!img.isContinuous())
+    return -1;
+
+  // Send size followed by data
+  sendUint(img.rows);
+  sendUint(img.cols);
+  sendBytes(3 * img.total(), img.data);
+
+  // Check it was received
+  uint32_t err;
+  receiveUint(err);
+  return err;
+}
+
+void CLIENT::receiveImg(cv::Mat_<cv::Vec3b> &img) {
+  // Receive size
+  uint32_t rows, cols;
+  receiveUint(rows);
+  receiveUint(cols);
+
+  // Allocate Mat and receive data
+  cv::Mat_<cv::Vec3b> recimg(rows, cols);
+  receiveBytes(3 * rows * cols, recimg.data);
+
+  // Acknowledge everything went ok
+  // TODO: in the future, send if there were errors
+  // 0 means no errors
+  sendUint(0);
+
+  // Copy received matrix over to source img
+  recimg.copyTo(img);
 }
 
 CLIENT::~CLIENT() { close(sockfd); }
