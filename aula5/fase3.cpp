@@ -4,7 +4,7 @@
 using namespace std;
 using namespace cv;
 
-#define THRESHOLD 0.85
+#define THRESHOLD 0.75
 
 int main(int argc, char *argv[]) {
   if (argc < 4) {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   auto fps = entrada.get(CV_CAP_PROP_FPS);
   Mat match = imread(nomeMatch, CV_64FC1);
   printf("Abrindo arquivos\n");
-  VideoWriter saida(nomeSaida, CV_FOURCC('X', '2', '6', '4'), fps,
+  VideoWriter saida(nomeSaida, CV_FOURCC('X', 'V', 'I', 'D'), fps,
                     Size(240, 320));
 
   // Tenta dar match pra cada frame e salva o resultado na saida
@@ -40,11 +40,16 @@ int main(int argc, char *argv[]) {
   while (entrada.isOpened()) {
     entrada.read(frameEntrada);
     // printf("\n\n\nNew frame\n");
+
     // Faz match com todos os resized images
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
-      auto result = results[i];
-      matchTemplate(frameEntrada, match, results[i], CV_TM_CCORR_NORMED);
+      // auto result = results[i];
+      matchTemplate(frameEntrada, resizedMatch, results[i], CV_TM_CCORR_NORMED);
+      // printf("Results size %d rows, %d cols\n", results[i].rows, result[i].cols);
+      printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
+      // results[i] = result;
+      // imshow("results", result);
     }
     // Acha melhor ponto
     Point bestLoc;
