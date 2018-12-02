@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
     // Pintar quadrado sobre local
     frameEntrada.copyTo(frameSaida);
     if (max > THRESHOLD) {
-      Point boundStart(bestLoc.x + (int) 0.2 * size, bestLoc.y + (int) 0.2 * size);
-      Point boundEnd(bestLoc.x + (int) 0.8 * size, bestLoc.y + (int) 0.8 * size);
+      Point boundStart(bestLoc.x +  size / 5, bestLoc.y + size / 5);
+      Point boundEnd(bestLoc.x + 4 * size / 5, bestLoc.y + 4 * size / 5);
       Rect rRect(boundStart, boundEnd);
       Mat numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
