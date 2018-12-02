@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   // Criar MNIST
   MnistFlann mnist(14, true, true);
   mnist.le(".");
-  printf("MNIST: amostras treino = %d",mnist.na);
+  mnist.train();
 
   // Abrir arquivos de video e arquivo de imagem
   VideoCapture entrada(nomeEntrada);
@@ -72,6 +72,11 @@ int main(int argc, char *argv[]) {
     // Pintar quadrado sobre local
     frameEntrada.copyTo(frameSaida);
     if (max > THRESHOLD) {
+      Rect rRect(bestLoc, Point(bestLoc.x + size, bestLoc.y + size));
+      Mat numberTemp = frameSaida(number);
+      Mat number;
+      numberTemp.copyTo(number);
+      mnist.bbox(number);
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size), Scalar(0, 0, 255), 3);
     }
     imshow("display", frameSaida);
