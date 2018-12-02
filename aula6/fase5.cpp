@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
     // Pintar quadrado sobre local
     frameEntrada.copyTo(frameSaida);
     if (max > THRESHOLD) {
-      auto rect = rRect(bestLoc, Point(bestLoc.x + size, bestLoc.y + size));
-      Mat numberTemp = frameSaida(number);
+      Rect rRect(bestLoc, Point(bestLoc.x + size, bestLoc.y + size));
+      Mat numberTemp = frameSaida(rRect);
       Mat number;
       numberTemp.copyTo(number);
       mnist.bbox(number);
