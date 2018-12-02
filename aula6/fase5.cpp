@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
       Mat numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
       // numberTemp.copyTo(number);
-      mnist.bbox(numberTemp);
+      mnist.bbox((Mat_<unsigned char>) numberTemp);
       imshow("number", numberTemp);
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size), Scalar(0, 0, 255), 3);
     }
