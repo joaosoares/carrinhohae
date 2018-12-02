@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     if (max > THRESHOLD) {
       Rect rRect(bestLoc, Point(bestLoc.x + size, bestLoc.y + size));
       Mat numberTemp = frameSaida(rRect);
-      Mat number;
+      cv::Mat_<float> number;
       numberTemp.copyTo(number);
       mnist.bbox(number);
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size), Scalar(0, 0, 255), 3);
