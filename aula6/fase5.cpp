@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
       Mat_<unsigned char> numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
       // numberTemp.copyTo(number);
-      mnist.bbox(numberTemp);
-      auto prediction = mnist.predict(numberTemp);
-      printf("Predicion: %.0f", prediction);
+      mnist.bbox((Mat_<unsigned char>) numberTemp);
+      // auto prediction = mnist.predict(numberTemp);
+      // printf("Predicion: %.0f", prediction);
       imshow("number", numberTemp);
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size), Scalar(0, 0, 255), 3);
     }
