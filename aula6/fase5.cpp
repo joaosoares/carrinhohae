@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     frameEntrada.copyTo(frameSaida);
     if (max > THRESHOLD) {
       Rect rRect(bestLoc, Point(bestLoc.x + size, bestLoc.y + size));
-      Mat numberTemp = frameSaida(rRect).convertTo();
+      Mat numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
       // numberTemp.copyTo(number);
       mnist.bbox(numberTemp);
