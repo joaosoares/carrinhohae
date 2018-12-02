@@ -31,7 +31,6 @@ int main(int argc, char *argv[]) {
   vector<int> matchSizes{30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 100, 110, 120};
   vector<Mat> resizedMatches(matchSizes.size());
   vector<Mat> results(matchSizes.size());
-  thread threads[matchSizes.size()];
 
   for (int i = 0; i < matchSizes.size(); i++) {
     auto size = matchSizes[i];
@@ -45,10 +44,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
       auto result = results[i];
-      threads[i] = std::thread(cref(matchTemplate), cref(frameEntrada), cref(resizedMatch), cref(result), cref(CV_TM_CCORR_NORMED));
-    }
-    for(int i = 0; i < matchSizes.size(); i++) {
-      threads[i].join();
+      matchTemplate(frameEntrada, match, results[i], CV_TM_CCORR_NORMED);
     }
     // Acha melhor ponto
     Point bestLoc;

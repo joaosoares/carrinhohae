@@ -6,9 +6,10 @@ using namespace cv;
 #define THRESHOLD 0.85
 
 int main(int argc, char *argv[]) {
+
   // Pegar nomes
   string nomeEntrada = "capturado.avi";
-  string nomeMatch = "quadrado.avi";
+  string nomeMatch = "quadrado.png";
   string nomeSaida = "locarec.avi";
 
   // Criar MNIST
@@ -21,8 +22,8 @@ int main(int argc, char *argv[]) {
   auto fps = entrada.get(CV_CAP_PROP_FPS);
   Mat match = imread(nomeMatch, CV_64FC1);
   printf("Abrindo arquivos\n");
-  VideoWriter saida(nomeSaida, CV_FOURCC('X', '2', '6', '4'), fps,
-                    Size(240, 320));
+  // VideoWriter saida(nomeSaida, CV_FOURCC('X', '2', '6', '4'), fps,
+  //                   Size(240, 320));
 
   // Tenta dar match pra cada frame e salva o resultado na saida
   printf("Comecando loop\n");
@@ -44,6 +45,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
       auto result = results[i];
+      matchTemplate(frameEntrada, resizedMatch, result, CV_TM_CCORR_NORMED);
     }
 
     // Acha melhor ponto
