@@ -44,12 +44,8 @@ int main(int argc, char *argv[]) {
     // Faz match com todos os resized images
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
-      // auto result = results[i];
       matchTemplate(frameEntrada, resizedMatch, results[i], CV_TM_CCORR_NORMED);
-      // printf("Results size %d rows, %d cols\n", results[i].rows, result[i].cols);
       printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
-      // results[i] = result;
-      // imshow("results", result);
     }
     // Acha melhor ponto
     Point bestLoc;

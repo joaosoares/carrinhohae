@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   string nomeSaida = "locarec.avi";
 
   // Criar MNIST
-  MNIST mnist(14, true, true);
+  MnistFlann mnist(14, true, true);
   mnist.le(".");
   printf("MNIST: amostras treino = %d",mnist.na);
 
@@ -38,14 +38,16 @@ int main(int argc, char *argv[]) {
     resize(match, resizedMatches[i], Size(size, size));
   }
 
+
   while (entrada.isOpened()) {
     entrada.read(frameEntrada);
     // printf("\n\n\nNew frame\n");
+
     // Faz match com todos os resized images
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
-      auto result = results[i];
-      matchTemplate(frameEntrada, resizedMatch, result, CV_TM_CCORR_NORMED);
+      matchTemplate(frameEntrada, resizedMatch, results[i], CV_TM_CCORR_NORMED);
+      printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
     }
 
     // Acha melhor ponto
@@ -77,8 +79,4 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
-}
-
-void cv_match_template(Mat& frameEntrada, Mat& resizedMatch, Mat& result) {
-  matchTemplate(frameEntrada, resizedMatch, result, CV_TM_CCORR_NORMED);
 }
