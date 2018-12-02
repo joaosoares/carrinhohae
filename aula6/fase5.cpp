@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     if (max > THRESHOLD) {
       Point boundStart(bestLoc.x + (int) 0.2 * size, bestLoc.y + (int) 0.2 * size);
       Point boundEnd(bestLoc.x + (int) 0.8 * size, bestLoc.y + (int) 0.8 * size);
-      Rect rRect(boudStart, boundEnd);
+      Rect rRect(boundStart, boundEnd);
       Mat numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
       // numberTemp.copyTo(number);
