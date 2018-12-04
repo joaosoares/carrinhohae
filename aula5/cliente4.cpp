@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   }
   bool shouldContinue = true;
   while (shouldContinue) {
-    entrada.read(frameEntrada);
+    entrada.read(frameEntrada);	
     // printf("\n\n\nNew frame\n");
 
     // Faz match com todos os resized images
@@ -69,6 +69,9 @@ int main(int argc, char *argv[]) {
     }
   }
 }
+
+
+
 
 
 int main(int argc, char *argv[]) { 
@@ -136,4 +139,15 @@ int main(int argc, char *argv[]) {
   destroyWindow("janela");
   client.receiveImgComp(image_cam);
   client.sendUint(1234567890);
+}
+
+
+
+int seleciona_comando() {
+	if ( (bestLoc.x + size/2) < 140 ) { // alvo a esquerda
+		return 4;
+	}
+	if ( 160 + (bestLoc.x + size/2) < 180 ) { // alvo a direita
+		return 6;
+	}	
 }
