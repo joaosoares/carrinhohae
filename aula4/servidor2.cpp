@@ -77,9 +77,9 @@ void anda(uint32_t comando) {
     softPwmWrite(1, 0);
     softPwmWrite(2, 60);
     softPwmWrite(3, 0);
-  } else if (comando == 2) {
-    softPwmWrite(0, 100);
-    softPwmWrite(1, 0);
+  } else if (comando == 2) { //tr�s
+    softPwmWrite(0, 0);
+    softPwmWrite(1, 100);
     softPwmWrite(2, 100);
     softPwmWrite(3, 0);
   } else if (comando == 3) {
@@ -87,34 +87,34 @@ void anda(uint32_t comando) {
     softPwmWrite(1, 0);
     softPwmWrite(2, 100);
     softPwmWrite(3, 0);
-  } else if (comando == 4) {
+  } else if (comando == 4) { //giro90 esquerda
     softPwmWrite(0, 0);
     softPwmWrite(1, 70);
-    softPwmWrite(2, 70);
-    softPwmWrite(3, 0);
-  } else if (comando == 5) {
-    softPwmWrite(0, 0);
-    softPwmWrite(1, 0);
-    softPwmWrite(2, 0);
-    softPwmWrite(3, 0);
-  } else if (comando == 6) {
-    softPwmWrite(0, 70);
-    softPwmWrite(1, 0);
     softPwmWrite(2, 0);
     softPwmWrite(3, 70);
-  } else if (comando == 7) {
+  } else if (comando == 5) { //parado
     softPwmWrite(0, 0);
-    softPwmWrite(1, 100);
+    softPwmWrite(1, 0);
     softPwmWrite(2, 0);
-    softPwmWrite(3, 60);
-  } else if (comando == 8) {
-    softPwmWrite(0, 0);
-    softPwmWrite(1, 100);
-    softPwmWrite(2, 100);
     softPwmWrite(3, 0);
-  } else if (comando == 9) {
-    softPwmWrite(0, 0);
-    softPwmWrite(1, 60);
+  } else if (comando == 6) { //giro90 direita
+    softPwmWrite(0, 70);
+    softPwmWrite(1, 0);
+    softPwmWrite(2, 70);
+    softPwmWrite(3, 0);
+  } else if (comando == 7) { //frente esquerda
+    softPwmWrite(0, 60);
+    softPwmWrite(1, 0);
+    softPwmWrite(2, 0);
+    softPwmWrite(3, 100);
+  } else if (comando == 8) { //frente
+    softPwmWrite(0, 100);
+    softPwmWrite(1, 0);
+    softPwmWrite(2, 0);
+    softPwmWrite(3, 100);
+  } else if (comando == 9) { //frente direita
+    softPwmWrite(0, 100);
+    softPwmWrite(1, 0);
     softPwmWrite(2, 0);
     softPwmWrite(3, 100);
   }
