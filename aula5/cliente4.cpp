@@ -4,7 +4,7 @@
 using namespace std;
 using namespace cv;
 
-#define THRESHOLD 0.75
+#define THRESHOLD 0.85
 
 // int estados[10] = {0, 7, 8, 9, 4, 5, 6, 1, 2, 3};
 
@@ -103,6 +103,20 @@ using namespace cv;
 //   }
 // }
 
+
+int seleciona_comando(int size, int x) {
+  printf("Size is %d, x is %d\n", size, x);
+  if (size > 70) {
+    return 5;
+  } else if ((x) > 200) { // alvo a esquerda
+    return 7;
+  } else if ((x) < 100) { // alvo a direita
+    return 9;
+  } else {
+    return 8;
+  }
+}
+
 int main(int argc, char *argv[]) {
   CLIENT client(argv[1]);
   Mat_<COR> image_cam;
@@ -134,16 +148,19 @@ int main(int argc, char *argv[]) {
   VideoWriter video(nomeVideo, CV_FOURCC('X', 'V', 'I', 'D'), 30, Size(nc, nl));
   image_cam.create(nl, nc);
   Mat_<COR> imagem_final;
-  imagem_final.create(240, 240 + nc);
-  imagem_final = grudaH(imagem, image_cam);
+  imagem_final.create(240, 240);
+  // imagem_final = grudaH(imagem, image_cam);
   resizeWindow("janela", 4 * imagem_final.cols, 4 * imagem_final.rows);
-  setMouseCallback("janela", on_mouse);
-  imagem_final = grudaH(imagem, image_cam);
+  // setMouseCallback("janela", on_mouse);
+  // imagem_final = grudaH(imagem, image_cam);
   imshow("janela", imagem_final);
 
 
   // COISAS DO TEMPLATE MATCH  
   Mat frameSaida;
+  string nomeMatch = "quadrado.png";
+  Mat match = imread(nomeMatch, CV_64FC1);
+
   // Cria vetor de imagens redimensionadas
   vector<int> matchSizes{30, 35, 40, 45, 50, 55,  60,  65,
                          70, 75, 80, 85, 90, 100, 110, 120};
@@ -164,15 +181,15 @@ int main(int argc, char *argv[]) {
       imagem(80, i) = vermelho;
       imagem(160, i) = vermelho;
     }
-    if (estado != 0) {
-      int l = ((estado - 1) / 3) * 80;
-      int c = ((estado - 1) % 3) * 80;
-      for (int i = 0; i < 80; i++) {
-        for (int j = 0; j < 80; j++) {
-          imagem(l + i, c + j) = vermelho;
-        }
-      }
-    }
+    // if (estado != 0) {
+    //   int l = ((estado - 1) / 3) * 80;
+    //   int c = ((estado - 1) % 3) * 80;
+    //   for (int i = 0; i < 80; i++) {
+    //     for (int j = 0; j < 80; j++) {
+    //       imagem(l + i, c + j) = vermelho;
+    //     }
+    //   }
+    // }
     client.receiveImgComp(image_cam);
     if (argc == 3)
       video << image_cam;
@@ -203,14 +220,16 @@ int main(int argc, char *argv[]) {
     }
 
 
-    // Envia para o carrinho
-    client.sendUint(seleciona_comando(size, bestLoc.x));
 
     // Pintar quadrado sobre local
     image_cam.copyTo(frameSaida);
     if (max > THRESHOLD) {
+      // Envia para o carrinho
+      client.sendUint(seleciona_comando(size, bestLoc.x));  
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size),
-                Scalar(0, 0, 255), 3);
+              Scalar(0, 0, 255), 3);
+    } else {
+      client.sendUint(5);
     }
     imshow("display", frameSaida);
     ch = waitKey(30);
@@ -218,18 +237,4 @@ int main(int argc, char *argv[]) {
   destroyWindow("janela");
   client.receiveImgComp(image_cam);
   client.sendUint(1234567890);
-}
-
-int seleciona_comando(int size, int x) {
-  if ((x + size / 2) < 140) { // alvo a esquerda
-    return 4;
-  } else if (160 + (x + size / 2) < 180) { // alvo a direita
-    return 6;
-  }
-  // parar
-  else if (size > 80) {
-    return 5;
-  } else {
-    return 8;
-  }
 }
