@@ -1,4 +1,5 @@
 #include "cekeikon.h"
+#include "cektiny.h"
 
 using namespace std;
 using namespace cv;
@@ -13,9 +14,8 @@ int main(int argc, char *argv[]) {
   string nomeSaida = "locarec.avi";
 
   // Criar MNIST
-  MnistFlann mnist(14, true, true);
-  mnist.le(".");
-  mnist.train();
+  network<sequential> net;
+  net.load("rede.net");
 
   // Abrir arquivos de video e arquivo de imagem
   VideoCapture entrada(nomeEntrada);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
       matchTemplate(frameEntrada, resizedMatch, results[i], CV_TM_CCORR_NORMED);
-      printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
+      //printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
     }
 
     // Acha melhor ponto
@@ -67,26 +67,43 @@ int main(int argc, char *argv[]) {
         size = matchSizes[i];
       }
     }
-    printf("Max %.2f\n", max);
+    //printf("Max %.2f\n", max);
 
     // Pintar quadrado sobre local
     frameEntrada.copyTo(frameSaida);
     if (max > THRESHOLD) {
-      Point boundStart(bestLoc.x +  size / 5, bestLoc.y + size / 5);
-      Point boundEnd(bestLoc.x + 4 * size / 5, bestLoc.y + 4 * size / 5);
+      Point boundStart(bestLoc.x +  3 * size / 10, bestLoc.y + 3 * size / 10);
+      Point boundEnd(bestLoc.x + 7 * size / 10, bestLoc.y + 7 * size / 10);
       Rect rRect(boundStart, boundEnd);
       auto numberTemp = frameSaida(rRect);
       // cv::Mat_<float> number;
       // numberTemp.copyTo(number);
-      Mat boundedImg = mnist.bbox((Mat_<unsigned char>) numberTemp);
-      auto prediction = mnist.predict((Mat_<unsigned char>) numberTemp);
-      printf("Predicion: %.0f", prediction);
-      imshow("number", boundedImg);
+      resize(numberTemp, numberTemp, Size(28, 28), 0, 0, INTER_AREA);
+      Mat number;
+      Mat numberGray;
+      Mat numberBin;
+      cvtColor(numberTemp, numberGray, COLOR_BGR2GRAY);
+      threshold(numberGray, numberBin, 127, 255, THRESH_BINARY);
+      numberBin.convertTo(number, CV_32F);
+      for (int l = 0; l < 28; l++) {
+        for (int c = 0; c < 28; c++) {
+          //printf("%.f", number.at<FLT>());
+          number.at<FLT>(l, c) = -2 * (number.at<FLT>(l, c) - 0.5);
+        }
+      }
+      vec_t vectorInput;
+      //printf("Net in data size: %d\n, image channels: %d", net.in_data_size(), numberGray.channels());
+      converte((Mat_<FLT>)number, vectorInput);
+      //printf("Convertido!\n");
+      label_t prediction = net.predict_label(vectorInput);
+      if (prediction != 1) printf("Predicion: %d\n", prediction);
+      imshow("number", numberBin);
       rectangle(frameSaida, bestLoc, Point(bestLoc.x + size, bestLoc.y + size), Scalar(0, 0, 255), 3);
     }
-    imshow("display", frameSaida);
+    imshow("display",frameSaida);
     if (waitKey(30) > 0) {
       break;
     }
   }
 }
+
