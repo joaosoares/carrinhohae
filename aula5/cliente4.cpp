@@ -1,6 +1,5 @@
 #include <opencv2/opencv.hpp>
-#include <thread>
-#include <time.h>
+#include "projeto.hpp"
 
 using namespace std;
 using namespace cv;
@@ -38,9 +37,6 @@ int main(int argc, char *argv[]) {
     resize(match, resizedMatches[i], Size(size, size));
   }
 
-  time_t startTime = time(NULL);
-  uint64_t frameCount = 0;
-  double calcFps = 0;
   while (entrada.isOpened()) {
     entrada.read(frameEntrada);
     // printf("\n\n\nNew frame\n");
@@ -49,6 +45,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < resizedMatches.size(); i++) {
       auto resizedMatch = resizedMatches[i];
       matchTemplate(frameEntrada, resizedMatch, results[i], CV_TM_CCORR_NORMED);
+      printf("Results frameEntrada %d rows, %d cols\n", frameEntrada.rows, frameEntrada.cols);
     }
     // Acha melhor ponto
     Point bestLoc;
@@ -78,13 +75,73 @@ int main(int argc, char *argv[]) {
     if (waitKey(30) > 0) {
       break;
     }
-    frameCount++;
-    time_t currentTime = time(NULL);
-    calcFps = (double) frameCount / ((double) currentTime - startTime);
-    printf("fps = %.2f\n", calcFps);
   }
 }
 
-void cv_match_template(Mat& frameEntrada, Mat& resizedMatch, Mat& result) {
-  matchTemplate(frameEntrada, resizedMatch, result, CV_TM_CCORR_NORMED);
+
+int main(int argc, char *argv[]) { 
+  CLIENT client(argv[1]);
+  Mat_<COR> image_cam; 
+  namedWindow("janela");
+  int ch=-1;
+  uint32_t nc, nl;
+  bool finish = false;
+  uint32_t verification;
+  COR cinza(128,128,128);
+  COR vermelho(0,0,255);
+  Mat_<COR> imagem(240,240,cinza);
+  
+  while(!finish){
+	  client.receiveUint(nl);
+	  client.sendUint(nl);
+	  client.receiveUint(verification);
+	  finish = testaUint(verification, 123);
+  }
+  finish = false;
+  while(!finish){
+	  client.receiveUint(nc);
+	  client.sendUint(nc);
+	  client.receiveUint(verification);
+	  finish = testaUint(verification, 123);
+  }
+  string nomeVideo = "vazio";
+  if (argc == 3) nomeVideo = argv[2];
+  VideoWriter video (nomeVideo,CV_FOURCC('X','V','I','D'),30,Size(nc,nl));
+  image_cam.create(nl, nc);
+  Mat_<COR> imagem_final;
+  imagem_final.create(240,240 + nc);
+  imagem_final = grudaH(imagem, image_cam);
+  resizeWindow("janela",4*imagem_final.cols,4*imagem_final.rows);
+  setMouseCallback("janela", on_mouse);
+  imagem_final = grudaH(imagem, image_cam);
+  imshow("janela",imagem_final);
+  
+  while ((char)ch != (char)27) {
+	imagem.setTo(cinza);
+	for (int i = 0; i < 240; i++) {
+		imagem(i, 80) = vermelho;
+		imagem(i, 160) = vermelho;
+		imagem(80, i) = vermelho;
+		imagem(160, i) = vermelho;
+	}
+    if (estado != 0) {
+		int l = ((estado - 1)/3)*80;
+		int c = ((estado - 1)%3)*80;
+		for (int i = 0 ; i < 80; i++) {
+			for (int j = 0 ; j < 80; j++) {
+				imagem(l + i, c + j)=vermelho;
+			}
+		}
+    }
+	client.receiveImgComp(image_cam);
+	if (argc == 3) video << image_cam;
+    client.sendUint(estados[estado]);
+    
+    imagem_final = grudaH(imagem, image_cam);
+    imshow("janela",imagem_final);
+    ch=waitKey(30);    
+  }
+  destroyWindow("janela");
+  client.receiveImgComp(image_cam);
+  client.sendUint(1234567890);
 }
