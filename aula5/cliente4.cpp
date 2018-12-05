@@ -7,22 +7,14 @@ using namespace cv;
 #define THRESHOLD 0.75
 
 int main(int argc, char *argv[]) {
-  if (argc < 4) {
-    perror("fase3 entrada.avi match.png saida.avi\n");
+  if (argc < 2) {
+    perror("cliente4 host\n");
     exit(-1);
   }
   // Pegar nomes
-  string nomeEntrada = argv[1];
-  string nomeMatch = argv[2];
-  string nomeSaida = argv[3];
-
-  // Abrir arquivos de video e arquivo de imagem
-  VideoCapture entrada(nomeEntrada);
-  auto fps = entrada.get(CV_CAP_PROP_FPS);
+  string nomeMatch = "quadrado.png";
   Mat match = imread(nomeMatch, CV_64FC1);
-  printf("Abrindo arquivos\n");
-  VideoWriter saida(nomeSaida, CV_FOURCC('X', 'V', 'I', 'D'), fps,
-                    Size(240, 320));
+  CLIENT client(argv[1]);
 
   // Tenta dar match pra cada frame e salva o resultado na saida
   printf("Comecando loop\n");
@@ -36,8 +28,8 @@ int main(int argc, char *argv[]) {
     auto size = matchSizes[i];
     resize(match, resizedMatches[i], Size(size, size));
   }
-
-  while (entrada.isOpened()) {
+  bool shouldContinue = true;
+  while (shouldContinue) {
     entrada.read(frameEntrada);
     // printf("\n\n\nNew frame\n");
 
