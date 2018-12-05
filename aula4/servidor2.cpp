@@ -89,18 +89,18 @@ void anda(uint32_t comando) {
     softPwmWrite(3, 0);
   } else if (comando == 4) { //giro90 esquerda
     softPwmWrite(0, 0);
-    softPwmWrite(1, 70);
+    softPwmWrite(1, 40);
     softPwmWrite(2, 0);
-    softPwmWrite(3, 70);
+    softPwmWrite(3, 40);
   } else if (comando == 5) { //parado
     softPwmWrite(0, 0);
     softPwmWrite(1, 0);
     softPwmWrite(2, 0);
     softPwmWrite(3, 0);
   } else if (comando == 6) { //giro90 direita
-    softPwmWrite(0, 70);
+    softPwmWrite(0, 40);
     softPwmWrite(1, 0);
-    softPwmWrite(2, 70);
+    softPwmWrite(2, 40);
     softPwmWrite(3, 0);
   } else if (comando == 7) { //frente esquerda
     softPwmWrite(0, 60);
